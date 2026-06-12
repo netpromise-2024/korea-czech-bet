@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: korea-czech-bet
+    runtime: static
+    buildCommand: "true"
+    staticPublishPath: ./outputs/soccer-bet
+    previews:
+      generation: automatic
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
