@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>오늘 축구 만원빵</title>
+    <link rel="stylesheet" href="./styles.css?v=5" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="scoreboard" aria-label="오늘 축구 내기">
+        <div class="hero-panel">
+          <button class="top-reset" id="resetButton" type="button" title="오늘 판 리셋" aria-label="오늘 판 리셋">
+            ↺
+          </button>
+          <div class="match-title">
+            <div>
+              <p class="eyebrow">월드컵 예선 내기</p>
+              <h1>한국 vs 체코</h1>
+              <p class="hero-copy">승리팀과 스코어를 찍고 만원빵 정산까지 한 번에.</p>
+            </div>
+          </div>
+
+          <figure class="match-poster">
+            <img src="./assets/korea-goal-photo.png?v=1" alt="한국 축구 국가대표 선수가 골 세리머니를 하는 모습" />
+          </figure>
+
+          <div class="match-meta">
+            <span id="todayLabel"></span>
+            <span>오전 11시</span>
+            <span>참여금 ₩10,000</span>
+          </div>
+
+          <div class="versus" aria-live="polite">
+            <strong id="homeName">홈팀</strong>
+            <span>VS</span>
+            <strong id="awayName">원정팀</strong>
+          </div>
+        </div>
+
+        <div class="summary-grid" aria-label="내기 요약">
+          <div class="summary-tile">
+            <span>참가자</span>
+            <strong id="participantCount">0명</strong>
+          </div>
+          <div class="summary-tile">
+            <span>총 판돈</span>
+            <strong id="potTotal">₩0</strong>
+          </div>
+          <div class="summary-tile">
+            <span>최다 선택</span>
+            <strong id="popularPick">-</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="참여 입력과 현황">
+        <form class="entry-form" id="entryForm" autocomplete="off">
+          <div class="form-header">
+            <h2>참여하기</h2>
+            <span>이름 · 승리팀 · 스코어</span>
+          </div>
+
+          <label class="field">
+            <span>이름</span>
+            <input id="playerName" name="playerName" required maxlength="14" placeholder="예: 민수" />
+          </label>
+
+          <fieldset class="pick-field">
+            <legend>승리팀</legend>
+            <div class="segmented" id="winnerGroup">
+              <label>
+                <input type="radio" name="winner" value="home" checked />
+                <span id="homePickLabel">홈팀</span>
+              </label>
+              <label>
+                <input type="radio" name="winner" value="draw" />
+                <span>무승부</span>
+              </label>
+              <label>
+                <input type="radio" name="winner" value="away" />
+                <span id="awayPickLabel">원정팀</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="score-inputs">
+            <label class="field">
+              <span id="homeScoreLabel">홈팀 점수</span>
+              <input id="homeScore" name="homeScore" type="number" inputmode="numeric" min="0" max="30" required value="2" />
+            </label>
+            <label class="field">
+              <span id="awayScoreLabel">원정팀 점수</span>
+              <input id="awayScore" name="awayScore" type="number" inputmode="numeric" min="0" max="30" required value="1" />
+            </label>
+          </div>
+
+          <p class="form-error" id="formError" role="alert"></p>
+
+          <button class="primary-button" type="submit">
+            <span aria-hidden="true">＋</span>
+            참가 등록
+          </button>
+        </form>
+
+        <section class="result-card" aria-label="경기 결과 입력">
+          <div class="form-header">
+            <h2>경기 결과</h2>
+            <span>정산용</span>
+          </div>
+          <div class="score-inputs compact">
+            <label class="field">
+              <span id="finalHomeLabel">홈팀</span>
+              <input id="finalHomeScore" type="number" inputmode="numeric" min="0" max="30" value="0" />
+            </label>
+            <label class="field">
+              <span id="finalAwayLabel">원정팀</span>
+              <input id="finalAwayScore" type="number" inputmode="numeric" min="0" max="30" value="0" />
+            </label>
+          </div>
+          <button class="secondary-button" id="settleButton" type="button">
+            <span aria-hidden="true">✓</span>
+            후보 보기
+          </button>
+          <div class="settlement" id="settlementBox" aria-live="polite">
+            <span>결과를 입력하면 당첨 후보가 여기에 표시됩니다.</span>
+          </div>
+        </section>
+
+        <section class="picks-panel" aria-label="참가 현황">
+          <div class="panel-header">
+            <div>
+              <h2>참가 현황</h2>
+              <span id="storageHint">브라우저에 자동 저장됨</span>
+            </div>
+            <button class="icon-button" id="copyButton" type="button" title="요약 복사" aria-label="요약 복사">
+              <span aria-hidden="true">⧉</span>
+            </button>
+          </div>
+
+          <div class="split-meter" aria-label="승리팀별 선택 비율">
+            <div class="meter-row">
+              <span id="homeMeterLabel">홈팀</span>
+              <strong id="homeMeterCount">0</strong>
+            </div>
+            <div class="meter-track">
+              <span id="homeMeterBar"></span>
+            </div>
+            <div class="meter-row">
+              <span>무승부</span>
+              <strong id="drawMeterCount">0</strong>
+            </div>
+            <div class="meter-track">
+              <span id="drawMeterBar"></span>
+            </div>
+            <div class="meter-row">
+              <span id="awayMeterLabel">원정팀</span>
+              <strong id="awayMeterCount">0</strong>
+            </div>
+            <div class="meter-track">
+              <span id="awayMeterBar"></span>
+            </div>
+          </div>
+
+          <div class="empty-state" id="emptyState">
+            <strong>아직 참여자가 없습니다.</strong>
+            <span>첫 예측을 등록하면 여기서 바로 볼 수 있어요.</span>
+          </div>
+
+          <div class="pick-list" id="pickList"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js?v=4"></script>
+  </body>
+</html>

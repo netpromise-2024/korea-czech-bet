@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">한국 대 체코 경기 안내 배너</title>
+  <desc id="desc">2026 북중미 월드컵 A조 조별예선, 한국 대 체코, 6월 12일 오전 11시, 멕시코 과달라하라 경기장</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f4ed"/>
+      <stop offset="0.52" stop-color="#d9dfd9"/>
+      <stop offset="1" stop-color="#194a35"/>
+    </linearGradient>
+    <linearGradient id="pitch" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c6e46"/>
+      <stop offset="1" stop-color="#0f4d34"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#07110d" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#sky)"/>
+  <path d="M0 108c167-58 334-78 503-58 134 16 238 53 373 49 98-3 199-28 324-70v222H0Z" fill="#ffffff" opacity="0.82"/>
+  <path d="M0 213h1200v256H0Z" fill="#171b1c" opacity="0.84"/>
+  <path d="M0 336c155-50 329-72 520-65 238 8 437 59 680 12v392H0Z" fill="url(#pitch)"/>
+  <path d="M0 512h1200" stroke="#ffffff" stroke-opacity="0.24" stroke-width="6"/>
+  <path d="M600 333v342" stroke="#ffffff" stroke-opacity="0.22" stroke-width="5"/>
+  <circle cx="600" cy="512" r="94" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="5"/>
+  <path d="M120 675 496 336h208l376 339Z" fill="#ffffff" opacity="0.07"/>
+
+  <g opacity="0.34">
+    <path d="M0 164h1200" stroke="#171b1c" stroke-width="22"/>
+    <path d="M84 166h1032" stroke="#ffffff" stroke-opacity="0.34" stroke-width="7" stroke-dasharray="35 18"/>
+    <path d="M48 215h1104" stroke="#ffffff" stroke-opacity="0.16" stroke-width="5" stroke-dasharray="24 14"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <path d="M158 509c5-61 17-110 36-148 18-36 45-59 79-67 34 8 61 31 80 67 18 38 30 87 35 148Z" fill="#be1e2d"/>
+    <circle cx="273" cy="251" r="45" fill="#d7ad83"/>
+    <path d="M221 231c24-37 78-43 109-6-21-10-53-11-109 6Z" fill="#141414"/>
+    <path d="M182 391h182l17 88H165Z" fill="#df4050"/>
+    <path d="M255 333h38v142h-38Z" fill="#171b1c" opacity="0.08"/>
+    <path d="M214 383c28 24 90 24 118 0" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="8"/>
+
+    <path d="M812 509c5-61 17-110 35-148 19-36 46-59 80-67 34 8 60 31 79 67 19 38 31 87 36 148Z" fill="#c81931"/>
+    <circle cx="927" cy="251" r="45" fill="#d4a77a"/>
+    <path d="M874 230c38-29 90-25 114 10-34-15-71-16-114-10Z" fill="#6b3c22"/>
+    <path d="M836 391h182l17 88H819Z" fill="#d6293d"/>
+    <path d="M909 333h38v142h-38Z" fill="#ffffff" opacity="0.1"/>
+    <path d="M868 383c28 24 90 24 118 0" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="8"/>
+  </g>
+
+  <g text-anchor="middle" font-family="Pretendard, Inter, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+    <text x="600" y="83" fill="#171b1c" font-size="42" font-weight="900">2026 북중미 월드컵 A조 조별예선</text>
+    <text x="390" y="210" fill="#be1e2d" font-size="132" font-weight="950">한국</text>
+    <text x="600" y="207" fill="#171b1c" font-size="76" font-weight="950">VS</text>
+    <text x="810" y="210" fill="#174a8b" font-size="132" font-weight="950">체코</text>
+    <text x="600" y="286" fill="#ffffff" font-size="30" font-weight="900" opacity="0.95">KOREA REPUBLIC  ·  CZECHIA</text>
+  </g>
+
+  <g transform="translate(315 407)" font-family="Pretendard, Inter, Apple SD Gothic Neo, Noto Sans KR, sans-serif" filter="url(#shadow)">
+    <rect x="0" y="0" width="570" height="104" rx="24" fill="#171b1c" opacity="0.9"/>
+    <text x="285" y="44" fill="#ffffff" text-anchor="middle" font-size="34" font-weight="950">6월 12일 오전 11시</text>
+    <text x="285" y="82" fill="#ffffff" text-anchor="middle" font-size="28" font-weight="850" opacity="0.92">멕시코 과달라하라 경기장</text>
+  </g>
+
+  <g fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.45">
+    <path d="M69 83h118"/>
+    <path d="M1013 83h118"/>
+    <path d="M91 105h56"/>
+    <path d="M1053 105h56"/>
+  </g>
+</svg>
