@@ -1,15 +1,9 @@
 services:
   - type: web
     name: korea-czech-bet
-    runtime: static
+    runtime: node
+    plan: free
     buildCommand: "true"
-    staticPublishPath: ./outputs/soccer-bet
+    startCommand: "npm start"
     previews:
       generation: automatic
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: SAMEORIGIN
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff

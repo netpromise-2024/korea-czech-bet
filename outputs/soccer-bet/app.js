@@ -1,5 +1,7 @@
-const STORAGE_KEY = "today-football-10000-bet-v3";
+const STORAGE_KEY = "today-football-10000-bet-fallback-v1";
 const STAKE = 10000;
+const API_BASE = "";
+const POLL_INTERVAL_MS = 3000;
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -24,6 +26,7 @@ const refs = {
   resetButton: $("#resetButton"),
   settleButton: $("#settleButton"),
   settlementBox: $("#settlementBox"),
+  storageHint: $("#storageHint"),
   homeMeterLabel: $("#homeMeterLabel"),
   awayMeterLabel: $("#awayMeterLabel"),
   homeMeterCount: $("#homeMeterCount"),
@@ -42,7 +45,9 @@ const defaultState = {
   picks: [],
 };
 
-let state = loadState();
+let state = fallbackState();
+let usingSharedServer = false;
+let isSyncing = false;
 
 function todayKey() {
   return new Intl.DateTimeFormat("sv-SE", {
@@ -53,7 +58,7 @@ function todayKey() {
   }).format(new Date());
 }
 
-function loadState() {
+function fallbackState() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (stored?.dateKey === todayKey()) {
@@ -75,8 +80,51 @@ function loadState() {
   };
 }
 
-function saveState() {
+function saveFallbackState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    ...options,
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Request failed: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+function applyRemoteState(nextState) {
+  state = {
+    ...defaultState,
+    ...nextState,
+    teams: { ...defaultState.teams, ...nextState.teams },
+    picks: Array.isArray(nextState.picks) ? nextState.picks : [],
+  };
+  usingSharedServer = true;
+  render();
+}
+
+async function syncState({ silent = false } = {}) {
+  if (isSyncing) return;
+  isSyncing = true;
+
+  try {
+    const nextState = await apiRequest("/api/state");
+    applyRemoteState(nextState);
+  } catch {
+    usingSharedServer = false;
+    if (!silent) render();
+  } finally {
+    isSyncing = false;
+  }
 }
 
 function formatWon(value) {
@@ -127,6 +175,9 @@ function setLabels() {
   refs.finalAwayLabel.textContent = state.teams.away;
   refs.homeMeterLabel.textContent = state.teams.home;
   refs.awayMeterLabel.textContent = state.teams.away;
+  refs.storageHint.textContent = usingSharedServer
+    ? "모두에게 실시간 공유됨"
+    : "이 브라우저에만 임시 저장됨";
 }
 
 function countByWinner() {
@@ -186,11 +237,7 @@ function createPickNode(pick) {
   deleteButton.title = `${pick.name} 삭제`;
   deleteButton.setAttribute("aria-label", `${pick.name} 삭제`);
   deleteButton.textContent = "×";
-  deleteButton.addEventListener("click", () => {
-    state.picks = state.picks.filter((entry) => entry.id !== pick.id);
-    saveState();
-    render();
-  });
+  deleteButton.addEventListener("click", () => deletePick(pick.id));
 
   main.append(name, detail);
   item.append(main, score, deleteButton);
@@ -237,7 +284,24 @@ function render() {
   renderPicks();
 }
 
-function handleEntrySubmit(event) {
+function validatePick({ name, winner, homeScore, awayScore }) {
+  if (name.length < 2) {
+    return "이름은 두 글자 이상으로 입력해주세요.";
+  }
+
+  if (homeScore === null || awayScore === null) {
+    return "스코어는 0부터 30 사이의 정수만 가능합니다.";
+  }
+
+  const predictedWinner = winnerFromScore(homeScore, awayScore);
+  if (winner !== predictedWinner) {
+    return "승리팀과 스코어의 승패가 맞지 않습니다.";
+  }
+
+  return "";
+}
+
+async function handleEntrySubmit(event) {
   event.preventDefault();
   refs.formError.textContent = "";
 
@@ -246,20 +310,10 @@ function handleEntrySubmit(event) {
   const winner = formData.get("winner");
   const homeScore = sanitizeScore(formData.get("homeScore"));
   const awayScore = sanitizeScore(formData.get("awayScore"));
+  const error = validatePick({ name, winner, homeScore, awayScore });
 
-  if (name.length < 2) {
-    refs.formError.textContent = "이름은 두 글자 이상으로 입력해주세요.";
-    return;
-  }
-
-  if (homeScore === null || awayScore === null) {
-    refs.formError.textContent = "스코어는 0부터 30 사이의 정수만 가능합니다.";
-    return;
-  }
-
-  const predictedWinner = winnerFromScore(homeScore, awayScore);
-  if (winner !== predictedWinner) {
-    refs.formError.textContent = "승리팀과 스코어의 승패가 맞지 않습니다.";
+  if (error) {
+    refs.formError.textContent = error;
     return;
   }
 
@@ -277,16 +331,39 @@ function handleEntrySubmit(event) {
     createdAt: new Date().toISOString(),
   };
 
-  state.picks = previous
-    ? state.picks.map((entry) => (entry.id === previous.id ? pick : entry))
-    : [pick, ...state.picks];
+  try {
+    const nextState = await apiRequest("/api/picks", {
+      method: "POST",
+      body: JSON.stringify(pick),
+    });
+    applyRemoteState(nextState);
+  } catch {
+    state.picks = previous
+      ? state.picks.map((entry) => (entry.id === previous.id ? pick : entry))
+      : [pick, ...state.picks];
+    usingSharedServer = false;
+    saveFallbackState();
+    render();
+  }
 
-  saveState();
   refs.entryForm.reset();
   refs.entryForm.elements.winner.value = winner;
   $("#homeScore").value = homeScore;
   $("#awayScore").value = awayScore;
-  render();
+}
+
+async function deletePick(id) {
+  try {
+    const nextState = await apiRequest(`/api/picks/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    applyRemoteState(nextState);
+  } catch {
+    state.picks = state.picks.filter((entry) => entry.id !== id);
+    usingSharedServer = false;
+    saveFallbackState();
+    render();
+  }
 }
 
 async function copySummary() {
@@ -311,16 +388,24 @@ async function copySummary() {
   }
 }
 
-function resetBoard() {
-  if (!confirm("오늘 판의 참가자와 팀 설정을 모두 지울까요?")) return;
-  state = {
-    ...defaultState,
-    dateKey: todayKey(),
-    picks: [],
-  };
-  saveState();
+async function resetBoard() {
+  if (!confirm("오늘 판의 참가자를 모두 지울까요?")) return;
+
+  try {
+    const nextState = await apiRequest("/api/reset", { method: "POST" });
+    applyRemoteState(nextState);
+  } catch {
+    state = {
+      ...defaultState,
+      dateKey: todayKey(),
+      picks: [],
+    };
+    usingSharedServer = false;
+    saveFallbackState();
+    render();
+  }
+
   refs.settlementBox.innerHTML = "<span>결과를 입력하면 당첨 후보가 여기에 표시됩니다.</span>";
-  render();
 }
 
 refs.entryForm.addEventListener("submit", handleEntrySubmit);
@@ -334,3 +419,5 @@ refs.settleButton.addEventListener("click", () => {
 });
 
 render();
+syncState();
+setInterval(() => syncState({ silent: true }), POLL_INTERVAL_MS);
