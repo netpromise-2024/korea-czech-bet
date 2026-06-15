@@ -1,4 +1,6 @@
-const STORAGE_KEY = "today-football-10000-bet-fallback-v1";
+const MATCH_KEY = "2026-06-19-korea-mexico";
+const MATCH_DATE_LABEL = "2026.06.19.(금)";
+const STORAGE_KEY = `${MATCH_KEY}-10000-bet-fallback-v1`;
 const STAKE = 10000;
 const API_BASE = "";
 const POLL_INTERVAL_MS = 3000;
@@ -40,7 +42,7 @@ const refs = {
 const defaultState = {
   teams: {
     home: "한국",
-    away: "체코",
+    away: "멕시코",
   },
   picks: [],
 };
@@ -49,19 +51,10 @@ let state = fallbackState();
 let usingSharedServer = false;
 let isSyncing = false;
 
-function todayKey() {
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
-
 function fallbackState() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (stored?.dateKey === todayKey()) {
+    if (stored?.dateKey === MATCH_KEY) {
       return {
         ...defaultState,
         ...stored,
@@ -75,7 +68,7 @@ function fallbackState() {
 
   return {
     ...defaultState,
-    dateKey: todayKey(),
+    dateKey: MATCH_KEY,
     picks: [],
   };
 }
@@ -157,14 +150,7 @@ function normalizeName(value) {
 }
 
 function setLabels() {
-  const dateText = new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-  }).format(new Date());
-
-  refs.todayLabel.textContent = dateText;
+  refs.todayLabel.textContent = MATCH_DATE_LABEL;
   refs.homeName.textContent = state.teams.home;
   refs.awayName.textContent = state.teams.away;
   refs.homePickLabel.textContent = state.teams.home;
@@ -198,6 +184,14 @@ function getPopularPick(counts) {
   return winners.map(teamName).join(", ");
 }
 
+function predictionLabel(winner) {
+  return winner === "draw" ? "무승부" : `${teamName(winner)} 승`;
+}
+
+function pickDescription(pick) {
+  return `${predictionLabel(pick.winner)} · ${formatWon(STAKE)}`;
+}
+
 function renderSummary() {
   const counts = countByWinner();
   const total = state.picks.length || 1;
@@ -225,7 +219,7 @@ function createPickNode(pick) {
   name.textContent = pick.name;
 
   const detail = document.createElement("span");
-  detail.textContent = `${teamName(pick.winner)} 승 · ${formatWon(STAKE)}`;
+  detail.textContent = pickDescription(pick);
 
   const score = document.createElement("div");
   score.className = "score-badge";
@@ -373,7 +367,7 @@ async function copySummary() {
     `참가자 ${state.picks.length}명 · 총 판돈 ${formatWon(state.picks.length * STAKE)}`,
     "",
     ...state.picks.map(
-      (pick) => `${pick.name}: ${teamName(pick.winner)} 승 / ${pick.homeScore}:${pick.awayScore}`,
+      (pick) => `${pick.name}: ${predictionLabel(pick.winner)} / ${pick.homeScore}:${pick.awayScore}`,
     ),
   ];
 
@@ -397,7 +391,7 @@ async function resetBoard() {
   } catch {
     state = {
       ...defaultState,
-      dateKey: todayKey(),
+      dateKey: MATCH_KEY,
       picks: [],
     };
     usingSharedServer = false;

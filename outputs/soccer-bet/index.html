@@ -3,31 +3,37 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>오늘 축구 만원빵</title>
-    <link rel="stylesheet" href="./styles.css?v=5" />
+    <title>한국 vs 멕시코 만원빵</title>
+    <script>
+      if (location.hostname === "korea-czech-bet.onrender.com") {
+        location.replace(`https://korea-czech-bet-shared.onrender.com/${location.search}${location.hash}`);
+      }
+    </script>
+    <link rel="stylesheet" href="./styles.css?v=6" />
   </head>
   <body>
     <main class="app-shell">
-      <section class="scoreboard" aria-label="오늘 축구 내기">
+      <section class="scoreboard" aria-label="한국 멕시코 축구 내기">
         <div class="hero-panel">
           <button class="top-reset" id="resetButton" type="button" title="오늘 판 리셋" aria-label="오늘 판 리셋">
             ↺
           </button>
           <div class="match-title">
             <div>
-              <p class="eyebrow">월드컵 예선 내기</p>
-              <h1>한국 vs 체코</h1>
-              <p class="hero-copy">승리팀과 스코어를 찍고 만원빵 정산까지 한 번에.</p>
+              <p class="eyebrow">2차전 만원빵</p>
+              <h1>한국 vs 멕시코</h1>
+              <p class="hero-copy">개최국 멕시코와 정면승부. 금요일 아침, 승리팀과 스코어를 더 짜릿하게 찍어보자.</p>
             </div>
           </div>
 
           <figure class="match-poster">
-            <img src="./assets/korea-goal-photo.png?v=1" alt="한국 축구 국가대표 선수가 골 세리머니를 하는 모습" />
+            <img src="./assets/korea-mexico-match.webp?v=1" alt="대한민국과 멕시코 축구 경기 이미지" />
           </figure>
 
           <div class="match-meta">
-            <span id="todayLabel"></span>
-            <span>오전 11시</span>
+            <span id="todayLabel">2026.06.19.(금)</span>
+            <span>10:00</span>
+            <span>에스타디오 과달라하라</span>
             <span>참여금 ₩10,000</span>
           </div>
 
@@ -172,6 +178,6 @@
       </section>
     </main>
 
-    <script src="./app.js?v=6"></script>
+    <script src="./app.js?v=7"></script>
   </body>
 </html>

@@ -7,12 +7,13 @@ const PORT = Number(process.env.PORT || 4173);
 const PUBLIC_DIR = path.join(__dirname, "outputs", "soccer-bet");
 const DATA_FILE = process.env.DATA_FILE || path.join("/tmp", "korea-czech-bet-state.json");
 const STAKE = 10000;
+const MATCH_KEY = "2026-06-19-korea-mexico";
 
 const defaultState = {
-  dateKey: todayKey(),
+  dateKey: MATCH_KEY,
   teams: {
     home: "한국",
-    away: "체코",
+    away: "멕시코",
   },
   picks: [],
 };
@@ -20,21 +21,11 @@ const defaultState = {
 let state = { ...defaultState, teams: { ...defaultState.teams }, picks: [] };
 let writeQueue = Promise.resolve();
 
-function todayKey() {
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
-
 function normalizeState(input = {}) {
-  const nextDateKey = todayKey();
-  if (input.dateKey !== nextDateKey) {
+  if (input.dateKey !== MATCH_KEY) {
     return {
       ...defaultState,
-      dateKey: nextDateKey,
+      dateKey: MATCH_KEY,
       teams: { ...defaultState.teams },
       picks: [],
     };
@@ -43,7 +34,7 @@ function normalizeState(input = {}) {
   return {
     ...defaultState,
     ...input,
-    dateKey: nextDateKey,
+    dateKey: MATCH_KEY,
     teams: { ...defaultState.teams, ...input.teams },
     picks: Array.isArray(input.picks) ? input.picks : [],
   };
@@ -176,7 +167,7 @@ async function handleApi(request, response, url) {
   }
 
   if (request.method === "POST" && url.pathname === "/api/reset") {
-    state = normalizeState({ ...defaultState, dateKey: todayKey(), picks: [] });
+    state = normalizeState({ ...defaultState, dateKey: MATCH_KEY, picks: [] });
     await saveState();
     return sendJson(response, 200, state);
   }
@@ -191,6 +182,7 @@ const contentTypes = {
   ".json": "application/json; charset=utf-8",
   ".png": "image/png",
   ".svg": "image/svg+xml",
+  ".webp": "image/webp",
 };
 
 async function serveStatic(request, response, url) {
