@@ -6,7 +6,7 @@ const path = require("node:path");
 const PORT = Number(process.env.PORT || 4173);
 const PUBLIC_DIR = path.join(__dirname, "outputs", "soccer-bet");
 const DATA_FILE = process.env.DATA_FILE || path.join("/tmp", "korea-czech-bet-state.json");
-const STAKE = 10000;
+const STAKE = 20000;
 const MATCH_KEY = "2026-06-19-korea-mexico";
 
 const defaultState = {
@@ -36,7 +36,9 @@ function normalizeState(input = {}) {
     ...input,
     dateKey: MATCH_KEY,
     teams: { ...defaultState.teams, ...input.teams },
-    picks: Array.isArray(input.picks) ? input.picks : [],
+    picks: Array.isArray(input.picks)
+      ? input.picks.map((pick) => ({ ...pick, stake: STAKE }))
+      : [],
   };
 }
 
