@@ -6,6 +6,7 @@ const path = require("node:path");
 const PORT = Number(process.env.PORT || 4173);
 const PUBLIC_DIR = path.join(__dirname, "outputs", "soccer-bet");
 const DATA_FILE = process.env.DATA_FILE || path.join("/tmp", "korea-czech-bet-state.json");
+const DATABASE_URL = process.env.DATABASE_URL;
 const STAKE = 20000;
 const MATCH_KEY = "2026-06-19-korea-mexico";
 
@@ -20,6 +21,7 @@ const defaultState = {
 
 let state = { ...defaultState, teams: { ...defaultState.teams }, picks: [] };
 let writeQueue = Promise.resolve();
+let databasePool;
 
 function normalizeState(input = {}) {
   if (input.dateKey !== MATCH_KEY) {
@@ -42,18 +44,82 @@ function normalizeState(input = {}) {
   };
 }
 
-async function loadState() {
+async function getDatabasePool() {
+  if (!DATABASE_URL) return null;
+  if (databasePool) return databasePool;
+
+  const { Pool } = require("pg");
+  databasePool = new Pool({
+    connectionString: DATABASE_URL,
+    ssl: DATABASE_URL.includes("localhost") ? false : { rejectUnauthorized: false },
+  });
+
+  await databasePool.query(`
+    create table if not exists match_states (
+      match_key text primary key,
+      state jsonb not null,
+      updated_at timestamptz not null default now()
+    )
+  `);
+
+  return databasePool;
+}
+
+async function loadFileState() {
   try {
     const data = await fs.readFile(DATA_FILE, "utf8");
-    state = normalizeState(JSON.parse(data));
+    return normalizeState(JSON.parse(data));
   } catch {
-    state = normalizeState(defaultState);
+    return normalizeState(defaultState);
   }
+}
+
+async function loadState() {
+  if (DATABASE_URL) {
+    try {
+      const pool = await getDatabasePool();
+      const result = await pool.query(
+        "select state from match_states where match_key = $1 limit 1",
+        [MATCH_KEY],
+      );
+
+      if (result.rows[0]?.state) {
+        state = normalizeState(result.rows[0].state);
+      } else {
+        state = await loadFileState();
+      }
+
+      await saveState();
+      return;
+    } catch (error) {
+      console.error("Postgres load failed, using file fallback:", error.message);
+    }
+  }
+
+  state = await loadFileState();
   await saveState();
 }
 
 function saveState() {
   writeQueue = writeQueue.then(async () => {
+    if (DATABASE_URL) {
+      try {
+        const pool = await getDatabasePool();
+        await pool.query(
+          `
+            insert into match_states (match_key, state, updated_at)
+            values ($1, $2::jsonb, now())
+            on conflict (match_key)
+            do update set state = excluded.state, updated_at = now()
+          `,
+          [MATCH_KEY, JSON.stringify(state)],
+        );
+        return;
+      } catch (error) {
+        console.error("Postgres save failed, using file fallback:", error.message);
+      }
+    }
+
     await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
     await fs.writeFile(DATA_FILE, JSON.stringify(state, null, 2));
   });
