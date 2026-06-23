@@ -9,7 +9,7 @@
         location.replace(`https://korea-czech-bet-shared.onrender.com/${location.search}${location.hash}`);
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=6" />
+    <link rel="stylesheet" href="./styles.css?v=7" />
   </head>
   <body>
     <main class="app-shell">
@@ -61,77 +61,79 @@
       </section>
 
       <section class="workspace" aria-label="참여 입력과 현황">
-        <form class="entry-form" id="entryForm" autocomplete="off">
-          <div class="form-header">
-            <h2>참여하기</h2>
-            <span>이름 · 승리팀 · 스코어</span>
-          </div>
+        <div class="bet-controls">
+          <form class="entry-form" id="entryForm" autocomplete="off">
+            <div class="form-header">
+              <h2>참여하기</h2>
+              <span>이름 · 승리팀 · 스코어</span>
+            </div>
 
-          <label class="field">
-            <span>이름</span>
-            <input id="playerName" name="playerName" required maxlength="14" placeholder="예: 민수" />
-          </label>
+            <label class="field">
+              <span>이름</span>
+              <input id="playerName" name="playerName" required maxlength="14" placeholder="예: 민수" />
+            </label>
 
-          <fieldset class="pick-field">
-            <legend>승리팀</legend>
-            <div class="segmented" id="winnerGroup">
-              <label>
-                <input type="radio" name="winner" value="home" checked />
-                <span id="homePickLabel">홈팀</span>
+            <fieldset class="pick-field">
+              <legend>승리팀</legend>
+              <div class="segmented" id="winnerGroup">
+                <label>
+                  <input type="radio" name="winner" value="home" checked />
+                  <span id="homePickLabel">홈팀</span>
+                </label>
+                <label>
+                  <input type="radio" name="winner" value="draw" />
+                  <span>무승부</span>
+                </label>
+                <label>
+                  <input type="radio" name="winner" value="away" />
+                  <span id="awayPickLabel">원정팀</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="score-inputs">
+              <label class="field">
+                <span id="homeScoreLabel">홈팀 점수</span>
+                <input id="homeScore" name="homeScore" type="number" inputmode="numeric" min="0" max="30" required value="2" />
               </label>
-              <label>
-                <input type="radio" name="winner" value="draw" />
-                <span>무승부</span>
-              </label>
-              <label>
-                <input type="radio" name="winner" value="away" />
-                <span id="awayPickLabel">원정팀</span>
+              <label class="field">
+                <span id="awayScoreLabel">원정팀 점수</span>
+                <input id="awayScore" name="awayScore" type="number" inputmode="numeric" min="0" max="30" required value="1" />
               </label>
             </div>
-          </fieldset>
 
-          <div class="score-inputs">
-            <label class="field">
-              <span id="homeScoreLabel">홈팀 점수</span>
-              <input id="homeScore" name="homeScore" type="number" inputmode="numeric" min="0" max="30" required value="2" />
-            </label>
-            <label class="field">
-              <span id="awayScoreLabel">원정팀 점수</span>
-              <input id="awayScore" name="awayScore" type="number" inputmode="numeric" min="0" max="30" required value="1" />
-            </label>
-          </div>
+            <p class="form-error" id="formError" role="alert"></p>
 
-          <p class="form-error" id="formError" role="alert"></p>
+            <button class="primary-button" type="submit">
+              <span aria-hidden="true">＋</span>
+              참가 등록
+            </button>
+          </form>
 
-          <button class="primary-button" type="submit">
-            <span aria-hidden="true">＋</span>
-            참가 등록
-          </button>
-        </form>
-
-        <section class="result-card" aria-label="경기 결과 입력">
-          <div class="form-header">
-            <h2>경기 결과</h2>
-            <span>정산용</span>
-          </div>
-          <div class="score-inputs compact">
-            <label class="field">
-              <span id="finalHomeLabel">홈팀</span>
-              <input id="finalHomeScore" type="number" inputmode="numeric" min="0" max="30" value="0" />
-            </label>
-            <label class="field">
-              <span id="finalAwayLabel">원정팀</span>
-              <input id="finalAwayScore" type="number" inputmode="numeric" min="0" max="30" value="0" />
-            </label>
-          </div>
-          <button class="secondary-button" id="settleButton" type="button">
-            <span aria-hidden="true">✓</span>
-            후보 보기
-          </button>
-          <div class="settlement" id="settlementBox" aria-live="polite">
-            <span>결과를 입력하면 당첨 후보가 여기에 표시됩니다.</span>
-          </div>
-        </section>
+          <section class="result-card" aria-label="경기 결과 입력">
+            <div class="form-header">
+              <h2>경기 결과</h2>
+              <span>정산용</span>
+            </div>
+            <div class="score-inputs compact">
+              <label class="field">
+                <span id="finalHomeLabel">홈팀</span>
+                <input id="finalHomeScore" type="number" inputmode="numeric" min="0" max="30" value="0" />
+              </label>
+              <label class="field">
+                <span id="finalAwayLabel">원정팀</span>
+                <input id="finalAwayScore" type="number" inputmode="numeric" min="0" max="30" value="0" />
+              </label>
+            </div>
+            <button class="secondary-button" id="settleButton" type="button">
+              <span aria-hidden="true">✓</span>
+              후보 보기
+            </button>
+            <div class="settlement" id="settlementBox" aria-live="polite">
+              <span>결과를 입력하면 당첨 후보가 여기에 표시됩니다.</span>
+            </div>
+          </section>
+        </div>
 
         <section class="picks-panel" aria-label="참가 현황">
           <div class="panel-header">
