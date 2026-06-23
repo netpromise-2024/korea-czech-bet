@@ -8,13 +8,13 @@ const PUBLIC_DIR = path.join(__dirname, "outputs", "soccer-bet");
 const DATA_FILE = process.env.DATA_FILE || path.join("/tmp", "korea-czech-bet-state.json");
 const DATABASE_URL = process.env.DATABASE_URL;
 const STAKE = 20000;
-const MATCH_KEY = "2026-06-19-korea-mexico";
+const MATCH_KEY = "2026-06-25-korea-south-africa";
 
 const defaultState = {
   dateKey: MATCH_KEY,
   teams: {
     home: "한국",
-    away: "멕시코",
+    away: "남아공",
   },
   picks: [],
 };

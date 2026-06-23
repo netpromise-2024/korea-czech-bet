@@ -1,5 +1,5 @@
-const MATCH_KEY = "2026-06-19-korea-mexico";
-const MATCH_DATE_LABEL = "2026.06.19.(금)";
+const MATCH_KEY = "2026-06-25-korea-south-africa";
+const MATCH_DATE_LABEL = "2026.06.25.(목)";
 const STORAGE_KEY = `${MATCH_KEY}-20000-bet-fallback-v1`;
 const STAKE = 20000;
 const API_BASE = "";
@@ -42,7 +42,7 @@ const refs = {
 const defaultState = {
   teams: {
     home: "한국",
-    away: "멕시코",
+    away: "남아공",
   },
   picks: [],
 };
@@ -362,7 +362,7 @@ async function deletePick(id) {
 
 async function copySummary() {
   const lines = [
-    "한국 vs 멕시코 2만원빵",
+    "한국 vs 남아공 2만원빵",
     `${state.teams.home} VS ${state.teams.away}`,
     `참가자 ${state.picks.length}명 · 총 판돈 ${formatWon(state.picks.length * STAKE)}`,
     "",
